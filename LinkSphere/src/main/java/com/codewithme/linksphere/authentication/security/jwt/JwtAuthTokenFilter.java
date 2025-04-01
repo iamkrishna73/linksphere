@@ -55,7 +55,7 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                 }
 
                 UserEntity  user = authenticationService.getUserByEmail(email);
-                log.info("Userissks fkbfsk: {}", user.getEmail());
+                log.info("User with this email: {}", user.getEmail());
                 request.setAttribute("authenticatedUser", user);
             }
 
