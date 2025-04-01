@@ -1,11 +1,14 @@
+import { useAuth } from "../context/AuthContextProvider";
 import classes from "./Feed.module.scss";
 const Feed = () => {
+  const {user, logout} = useAuth();
+
   return (
     <div className={classes.root}>
       <header className={classes.header}>
-        <div>Hello mikedane@gmail.com</div>
+        <div>Hello {user?.email}</div>
         <span></span>
-        <button>Logout</button>
+        <button onClick={logout}>Logout</button>
       </header>
       <main className={classes.content}>
         <div className={classes.left}></div>

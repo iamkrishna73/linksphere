@@ -10,7 +10,7 @@ import classes from "./Login.module.scss";
 
 const Login = () => {
   const [errorMessages, setErrorMessages] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

@@ -123,7 +123,6 @@ public class AuthenticationService implements IAuthenticationService {
         }
     }
 
-
     /**
      * Email services
      */

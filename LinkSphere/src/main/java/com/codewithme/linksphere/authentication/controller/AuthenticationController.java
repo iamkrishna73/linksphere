@@ -21,6 +21,7 @@ public class AuthenticationController {
     }
     @PostMapping("/login")
     public AuthenticationResponseDto loginPage(@Valid @RequestBody AuthenticationRequestDto loginRequestBody) {
+        System.out.println();
         return authenticationService.loginUser(loginRequestBody);
     }
 

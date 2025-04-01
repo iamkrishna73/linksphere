@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../../../components/Button/Button";
 import Input from "../../../components/Input/Input";
+import { useAuth } from "../../../context/AuthContextProvider";
 import AuthLayout from "../../components/AuthLayout";
 import Box from "../../components/Box/Box";
 import Seperator from "../../components/Seperator/Seperator";
@@ -9,14 +10,34 @@ import classes from "./Signup.module.scss";
 
 const Signup = () => {
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const email = e.currentTarget.email.value;
+    const password = e.currentTarget.password.value;
+    try {
+      await signup(email, password);
+      navigate("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        setErrorMessages([error.message]);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <AuthLayout className={classes.root}>
       <Box>
         <h1>Signup</h1>
         <p>Make the most of your professional life</p>
-        <form>
-          <Input label="Email" type="email" />
-          <Input label="Password" type="password" />
+        <form onSubmit={handleSignup}>
+          <Input label="Email" type="email" id="email"/>
+          <Input label="Password" type="password" id="password"/>
           {errorMessages && <p className={classes.error}>{errorMessages}</p>}
           <p className={classes.disclaimer}>
             By clicking Agree & Join, you agree to the LinkedSphere's{" "}

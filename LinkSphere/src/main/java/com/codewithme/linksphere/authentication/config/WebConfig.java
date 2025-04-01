@@ -13,8 +13,6 @@ import java.util.List;
 
 @Configuration
 public class WebConfig {
-//    @Value("${frontend.url}")
-//    private List<String> frontendUrl;
 
     @Bean
     CorsConfigurationSource corsConfigurationSource(@Value("${frontend.url}") List<String> allowedOrigins) {

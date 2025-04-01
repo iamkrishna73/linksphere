@@ -4,7 +4,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 interface User {
   id: string;
   email: string;
-  emailVarified: boolean;
+  emailVerified: boolean; // Fixed typo
 }
 
 interface AuthContextType {
@@ -17,7 +17,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
 
 export function AuthContextProvider() {
@@ -118,12 +122,12 @@ export function AuthContextProvider() {
   if (!isLoading && !user && !isOnAuthPage) {
     return <Navigate to="/login" />;
   }
-  if (user && isOnAuthPage && user.emailVarified) {
+  if (user && isOnAuthPage && user.emailVerified) {
     return <Navigate to="/" />;
   }
   return (
     <AuthContext.Provider value={{ login, signup, logout, user }}>
-      {user && !user.emailVarified && isOnAuthPage ? (
+      {user && !user.emailVerified ? (
         <Navigate to="/verify-email" />
       ) : null}
       <Outlet />
