@@ -5,10 +5,13 @@ import com.codewithme.linksphere.authentication.dtos.AuthenticationResponseDto;
 import com.codewithme.linksphere.authentication.entities.UserEntity;
 import com.codewithme.linksphere.authentication.service.IAuthenticationService;
 import com.codewithme.linksphere.dtos.Response;
+import com.codewithme.linksphere.exception.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -57,6 +60,20 @@ public class AuthenticationController {
     @GetMapping("/user/me")
     public UserEntity getUser(@RequestAttribute("authenticatedUser") UserEntity user) {
         return user;
+    }
+
+    @PutMapping("/profile/id")
+    public UserEntity updateProfile(@RequestAttribute("authenticatedUser") UserEntity user, @PathVariable Long id,
+                                                   @RequestParam(required = false) String firstName,
+                                                   @RequestParam(required = false) String lastName,
+                                                   @RequestParam(required = false) String company,
+                                                   @RequestParam(required = false) String position,
+                                                   @RequestParam(required = false) String location) {
+        if(!user.getId().equals(id)) {
+            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not have the permission to update this profile");
+        }
+        return authenticationService.updateUserProfile(id, firstName, lastName, company, position, location);
+
     }
 
 }

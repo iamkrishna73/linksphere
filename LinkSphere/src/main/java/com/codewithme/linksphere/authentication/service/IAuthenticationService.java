@@ -16,4 +16,6 @@ public interface IAuthenticationService {
     void sendPasswordResetToken(String email);
 
     void resetPassword(String email, String newPassword, String token);
+
+    UserEntity updateUserProfile(Long id, String firstName, String lastName, String company, String position, String location);
 }
