@@ -62,7 +62,7 @@ public class AuthenticationController {
         return user;
     }
 
-    @PutMapping("/profile/id")
+    @PutMapping("/profile/{id}")
     public UserEntity updateProfile(@RequestAttribute("authenticatedUser") UserEntity user, @PathVariable Long id,
                                                    @RequestParam(required = false) String firstName,
                                                    @RequestParam(required = false) String lastName,
