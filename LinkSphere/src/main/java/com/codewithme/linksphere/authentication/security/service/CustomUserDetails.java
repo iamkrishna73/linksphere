@@ -1,6 +1,6 @@
 package com.codewithme.linksphere.authentication.security.service;
 
-import com.codewithme.linksphere.authentication.entities.UserEntity;
+import com.codewithme.linksphere.authentication.entities.AuthenticationUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class CustomUserDetails implements UserDetails {
         this.password = password;
     }
 
-    public static CustomUserDetails build(UserEntity user) {
+    public static CustomUserDetails build(AuthenticationUser user) {
         return new CustomUserDetails(
                 user.getId(),
                 user.getEmail(),

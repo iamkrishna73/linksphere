@@ -1,14 +1,11 @@
 package com.codewithme.linksphere.authentication.security.service;
 
-import com.codewithme.linksphere.authentication.entities.UserEntity;
 import com.codewithme.linksphere.authentication.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class CustomUserDetailsService implements UserDetailsService {

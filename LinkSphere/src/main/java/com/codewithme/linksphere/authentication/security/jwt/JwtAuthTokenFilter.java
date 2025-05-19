@@ -1,6 +1,6 @@
 package com.codewithme.linksphere.authentication.security.jwt;
 
-import com.codewithme.linksphere.authentication.entities.UserEntity;
+import com.codewithme.linksphere.authentication.entities.AuthenticationUser;
 import com.codewithme.linksphere.authentication.security.service.CustomUserDetailsService;
 import com.codewithme.linksphere.authentication.service.AuthenticationService;
 import jakarta.servlet.FilterChain;
@@ -54,13 +54,14 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                   log.warn("JWT token is valid, but email extraction failed.");
                 }
 
-                UserEntity  user = authenticationService.getUserByEmail(email);
+                AuthenticationUser user = authenticationService.getUserByEmail(email);
                 log.info("User with this email: {}", user.getEmail());
                 request.setAttribute("authenticatedUser", user);
             }
 
         } catch (Exception e) {
-            log.error("Cannot set user authentication", e);  // Logs full exception stack trace
+            log.error("Cannot set user authentication", e.getMessage());  // Logs full exception stack trace
+            throw new RuntimeException("Authentication failed " + e.getMessage()); // Rethrow the exception after logging
         }
         filterChain.doFilter(request, response);
     }

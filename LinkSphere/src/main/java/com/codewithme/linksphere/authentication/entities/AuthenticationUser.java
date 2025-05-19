@@ -1,21 +1,27 @@
 package com.codewithme.linksphere.authentication.entities;
 
+import com.codewithme.linksphere.feed.entities.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
 @Table(name = "users")
-public class UserEntity {
+public class AuthenticationUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
+
+    @NotNull
     @Email
+    @Column(unique = true)
     private String email;
 
     private Boolean emailVerified = false;
@@ -29,15 +35,21 @@ public class UserEntity {
     private String lastName = null;
     private String company = null;
     private String position = null;
+    private String profilePicture = null;
     private String location = null;
     private Boolean profileComplete = false;
 
-    public UserEntity(String email, String password) {
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
+
+    public AuthenticationUser(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
-    public UserEntity() {
+    public AuthenticationUser() {
     }
 
     public Long getId() {
@@ -152,5 +164,19 @@ public class UserEntity {
 
     public Boolean getProfileComplete() {
         return profileComplete;
+    }
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
+    }
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }

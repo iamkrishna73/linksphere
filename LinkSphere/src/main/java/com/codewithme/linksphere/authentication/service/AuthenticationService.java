@@ -2,11 +2,13 @@ package com.codewithme.linksphere.authentication.service;
 
 import com.codewithme.linksphere.authentication.dtos.AuthenticationRequestDto;
 import com.codewithme.linksphere.authentication.dtos.AuthenticationResponseDto;
-import com.codewithme.linksphere.authentication.entities.UserEntity;
+import com.codewithme.linksphere.authentication.entities.AuthenticationUser;
 import com.codewithme.linksphere.authentication.repositories.UserRepository;
 import com.codewithme.linksphere.authentication.security.jwt.JwtUtils;
 import com.codewithme.linksphere.authentication.utils.EmailUtils;
 import com.codewithme.linksphere.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,13 +36,15 @@ public class AuthenticationService implements IAuthenticationService {
     private final EmailUtils emailUtils;
     private final JwtUtils jwtUtils;
     private final int durationInMinutes = 20;
+    private final EntityManager entityManager;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailUtils emailUtils, JwtUtils jwtUtils, AuthenticationManager authenticationManager) {
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailUtils emailUtils, JwtUtils jwtUtils, AuthenticationManager authenticationManager, EntityManager entityManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailUtils = emailUtils;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class AuthenticationService implements IAuthenticationService {
             //log.error("Email already exists");
             throw  new ResourceNotFoundException("Email already Exists");
         }
-        UserEntity user = new UserEntity(authenticationRequestDto.email(), passwordEncoder.encode(authenticationRequestDto.password()));
+        AuthenticationUser user = new AuthenticationUser(authenticationRequestDto.email(), passwordEncoder.encode(authenticationRequestDto.password()));
         String jwtToken = jwtUtils.generateTokenFromUserEmail(authenticationRequestDto.email());
         String emailVerificationToken = generateEmailVerificationToken();
         String hashedToken = passwordEncoder.encode(emailVerificationToken);
@@ -73,7 +76,7 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     @Override
-    public UserEntity getUserByEmail(String email) {
+    public AuthenticationUser getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
     }
 
@@ -135,7 +138,7 @@ public class AuthenticationService implements IAuthenticationService {
         return token.toString();
     }
     public void sendEmailVerificationToken(String email) {
-        Optional<UserEntity> user = userRepository.findByEmail(email);
+        Optional<AuthenticationUser> user = userRepository.findByEmail(email);
         if (user.isPresent() && !user.get().getEmailVerified()) {
             String emailVerificationToken = generateEmailVerificationToken();
             String hashedToken = passwordEncoder.encode(emailVerificationToken);
@@ -159,7 +162,7 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     public void validateEmailVerificationToken(String token, String email) {
-        Optional<UserEntity> user = userRepository.findByEmail(email);
+        Optional<AuthenticationUser> user = userRepository.findByEmail(email);
         boolean isMatch = passwordEncoder.matches(token, user.get().getEmailVerificationToken());
         log.info("isMatch {}",  isMatch );
         if (user.isPresent() && passwordEncoder.matches(token, user.get().getEmailVerificationToken())
@@ -176,7 +179,7 @@ public class AuthenticationService implements IAuthenticationService {
         }
     }
     public void sendPasswordResetToken(String email) {
-        Optional<UserEntity> user = userRepository.findByEmail(email);
+        Optional<AuthenticationUser> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             String passwordResetToken = generateEmailVerificationToken();
             String hashedToken = passwordEncoder.encode(passwordResetToken);
@@ -200,7 +203,7 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     public void resetPassword(String email, String newPassword, String token) {
-        Optional<UserEntity> user = userRepository.findByEmail(email);
+        Optional<AuthenticationUser> user = userRepository.findByEmail(email);
         if (user.isPresent() && passwordEncoder.matches(token, user.get().getPasswordResetToken())
                 && !user.get().getPasswordResetTokenExpiryDate().isBefore(LocalDateTime.now())) {
             user.get().setPasswordResetToken(null);
@@ -216,10 +219,8 @@ public class AuthenticationService implements IAuthenticationService {
     }
 
     @Override
-    public UserEntity updateUserProfile(Long id, String firstName, String lastName, String company, String position, String location) {
-        UserEntity user = userRepository.findById(id).orElseThrow(()-> {
-            throw new RuntimeException("User not found");
-        });
+    public AuthenticationUser updateUserProfile(Long id, String firstName, String lastName, String company, String position, String location) {
+        AuthenticationUser user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found"));
         if(firstName != null) {user.setFirstName(firstName);}
         if(lastName != null){user.setLastName(lastName);}
         if (company != null){user.setCompany(company);}
@@ -228,4 +229,15 @@ public class AuthenticationService implements IAuthenticationService {
        return userRepository.save(user);
     }
 
+    @Transactional
+    @Override
+    public void deleteUser(Long userId) {
+        AuthenticationUser user = entityManager.find(AuthenticationUser.class, userId);
+        if(user != null) {
+            entityManager.createNativeQuery("delete from post_likes where user_id = :userId")
+                    .setParameter("userId", userId)
+                    .executeUpdate();
+            userRepository.deleteById(userId);
+        }
+    }
 }
