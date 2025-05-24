@@ -1,10 +1,22 @@
 import { ReactNode } from "react";
 import classes from "./AuthLayout.module.scss";
 
-const AuthLayout = ({ children, className}: { children: ReactNode, className: string }) => {
+const AuthLayout = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className: string;
+}) => {
   return (
     <div className={`${classes.root} ${className}`}>
-      <header className={classes.container}>LinkSphere</header>
+      <header className={classes.container}>
+        <div className={classes.container}>
+          <a href="/">
+            <img src="/logo.svg" alt="" className={classes.logo} />
+          </a>
+        </div>
+      </header>
       <main className={classes.container}>{children}</main>
       <footer>
         <ul className={classes.container}>

@@ -41,7 +41,7 @@ public class AuthenticationService implements IAuthenticationService {
     public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailUtils emailUtils, JwtUtils jwtUtils, AuthenticationManager authenticationManager, EntityManager entityManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailUtils = emailUtils;
+        this.emailUtils = emailUtils;t
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.entityManager = entityManager;
@@ -63,7 +63,7 @@ public class AuthenticationService implements IAuthenticationService {
         userRepository.save(user);
         String subject = "Email Verification";
         String body = String.format("""
-                        Only one step to take full advantage of LinkedIn.
+                        Only one step to take full advantage of linksphere.
                         
                         Enter this code to verify your email: %s. The code will expire in %s minutes.""",
                 emailVerificationToken, durationInMinutes);
@@ -146,7 +146,7 @@ public class AuthenticationService implements IAuthenticationService {
             user.get().setEmailVerificationTokenExpiryDate(LocalDateTime.now().plusMinutes(durationInMinutes));
             userRepository.save(user.get());
             String subject = "Email Verification";
-            String body = String.format("Only one step to take full advantage of LinkedIn.\n\n"
+            String body = String.format("Only one step to take full advantage of linksphere.\n\n"
                             + "Enter this code to verify your email: " + "%s\n\n" + "The code will expire in " + "%s"
                             + " minutes.",
                     emailVerificationToken, durationInMinutes);

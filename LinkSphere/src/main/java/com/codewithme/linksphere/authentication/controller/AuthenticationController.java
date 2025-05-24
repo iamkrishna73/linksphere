@@ -48,6 +48,7 @@ public class AuthenticationController {
     }
     @PutMapping("/validate-email-verification-token")
     public Response verifyEmail(@RequestParam String token, @RequestAttribute("authenticatedUser") AuthenticationUser user) {
+        System.out.println("token: "+ token);
         authenticationService.validateEmailVerificationToken(token, user.getEmail());
         return new Response("Email verified successfully.");
     }

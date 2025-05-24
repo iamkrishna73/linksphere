@@ -13,6 +13,8 @@ const VerifyEmail = () => {
   const nivagate = useNavigate();
 
   const hanadleValidateEmail = async (code: string) => {
+    console.log("code", typeof code);
+    
     setErrorMessages("");
     try {
       const response = await fetch(

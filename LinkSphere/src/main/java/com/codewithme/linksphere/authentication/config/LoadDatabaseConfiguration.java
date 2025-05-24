@@ -27,10 +27,14 @@ public class LoadDatabaseConfiguration {
     public CommandLineRunner initDatabase(UserRepository userRepository, PostRepository postRepository
                                           ) {
         return args -> {
-            postRepository.deleteAll(); // delete posts first (due to FK constraint)
-            userRepository.deleteAll();
-            List<AuthenticationUser> users = createUsers(userRepository);
-            createPosts(postRepository, users);
+            if(userRepository.findAll().isEmpty()) {
+
+
+                postRepository.deleteAll(); // delete posts first (due to FK constraint)
+                userRepository.deleteAll();
+                List<AuthenticationUser> users = createUsers(userRepository);
+                createPosts(postRepository, users);
+            }
         };
     }
 
