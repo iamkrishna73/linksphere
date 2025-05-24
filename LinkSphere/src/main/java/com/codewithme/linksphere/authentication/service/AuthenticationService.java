@@ -41,7 +41,7 @@ public class AuthenticationService implements IAuthenticationService {
     public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailUtils emailUtils, JwtUtils jwtUtils, AuthenticationManager authenticationManager, EntityManager entityManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailUtils = emailUtils;t
+        this.emailUtils = emailUtils;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.entityManager = entityManager;
